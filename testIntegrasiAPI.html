@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PokeAPI</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/PokeAPI/media/master/logo/pokeapi_256.png" type="image/x-icon">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    body{
+      
+        border-radius: 20%;
+        background: linear-gradient(to right, rgb(29, 176, 202), rgb(165, 8, 100));
+    }
+    .modal-bg{
+        background-color: #fdd1df;
+        border-radius: 5%;
+        width: 100%;
+    }
+    .image-pokemon{
+        width: 250px;
+        height: 260px;
+    }
+    .pokemon-content-error{
+        color: white;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height: 100vh;">
+            <div class="col-md-4 text-center mt-4">
+                <img src="https://raw.githubusercontent.com/PokeAPI/media/master/logo/pokeapi_256.png">
+                <div class="input-group mt-4">
+                    <!-- Input nama pokemon "ditto" -->
+                    <input class="form-control" type="text" id="pokemonName" placeholder="Enter Pokémon name 'ditto'">
+                    <!-- Tombol untuk melihat info pokemon -->
+                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModal" onclick="fetchPokemon()">
+                        Search
+                    </button>
+                </div>
+                <div id="pokemonData" class="mb-4 mt-4">
+                    <!-- Menampilkan data pokemon -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchPokemon() {
+            // pendefenisian variabel untuk menggunakan API
+            const pokemonName = document.getElementById('pokemonName').value.toLowerCase();
+            const url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`;
+            const pokemonDataDiv = document.getElementById('pokemonData');
+        
+            // Error Handling
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Pokémon not found!');
+                }
+                const data = await response.json();
+                displayPokemon(data);
+            } catch (error) {
+                pokemonDataDiv.innerHTML = `<p class="pokemon-content-error">${error.message}</p>`;
+            }
+        }
+        
+        // tempat peletakan variabel API yang telah dibuat sesua data API 
+        function displayPokemon(data) {
+            const pokemonDataDiv = document.getElementById('pokemonData');
+            pokemonDataDiv.innerHTML = `
+           
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content modal-bg">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Pokémon Info</h5>
+                                <img class="image-pokemon" src="${data.sprites.front_default}" alt="${data.name}">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body">
+                                <div class="row justify-content-between py-2 mb-2">
+                                    <div class="col-4">
+                                        <p class="card-text">Name   </p>
+                                        <p class="card-text">Height </p>
+                                        <p class="card-text">Weight </p>
+                                        <p class="card-text">Type   </p>
+                                    </div>
+                                    <div class="col-4">
+                                        <p class="card-text">: ${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</p>
+                                        <p class="card-text">: ${data.height / 10} m</p>
+                                        <p class="card-text">: ${data.weight / 10} kg</p>
+                                        <p class="card-text">: ${data.types.map(typeInfo => typeInfo.type.name).join(', ')}</p>
+                                    </div>
+                                </div>
+                                <audio controls>
+                                    <source src="${data.cries.legacy}" type="audio/mpeg">
+                                </audio>
+                            </div>
+                            
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
